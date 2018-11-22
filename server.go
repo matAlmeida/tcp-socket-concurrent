@@ -42,28 +42,35 @@ func main() {
 					command = strings.Join(recvmessage[:1], "")
 				}
 
+				msgToSend := ""
 				if command == "send" {
 					newMessage := strings.Join(recvmessage[1:], "")
 					messages = append(messages, newMessage)
-					c.Write([]byte("message added 🔥\n"))
+					msgToSend = "Message stored 🔥\n"
+					c.Write([]byte(msgToSend))
 
 				} else if command == "get" {
 					if len(messages) > 0 {
-						msgToSend := messages[len(messages)-1]
+						msgToSend = messages[len(messages)-1]
 						messages = messages[:len(messages)-1]
 						c.Write([]byte(msgToSend))
 					} else {
-						c.Write([]byte("We hasn't any message stored!\n"))
+						msgToSend = "We hasn't any message stored!\n"
+						c.Write([]byte(msgToSend))
 					}
 
-				} else if command == "exit" {
-					c.Write([]byte("Bye Bye"))
+				} else if command == "exit" || command == "" {
+					msgToSend = "Bye Bye\n"
+					fmt.Printf("%s has Disconnected!\n", c.RemoteAddr().String())
+					c.Write([]byte(msgToSend))
 					break
 
 				} else {
-					c.Write([]byte("Invalid command" + "\n"))
+					msgToSend = "Invalid command\n"
+					c.Write([]byte(msgToSend))
 
 				}
+				log.Print(c.RemoteAddr().String(), " - ", strings.ToUpper(command), " - ", strings.Replace(strings.Join(recvmessage[1:], ""), "\n", "", -1), " - ", strings.Replace(msgToSend, "\n", "", -1))
 			}
 			c.Close()
 		}(conn)
