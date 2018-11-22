@@ -1,5 +1,7 @@
 # TCP Socket with Concurrenc
 
+Server and Client using TCP protocol with Concurrenc
+
 ## Building
 
 Install [golang](https://golang.org)
