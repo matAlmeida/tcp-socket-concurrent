@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"net"
 	"os"
@@ -10,7 +11,15 @@ import (
 	"syscall"
 )
 
+var (
+	port string
+	host string
+)
+
 func main() {
+	flag.StringVar(&port, "P", "8081", "port of the server.")
+	flag.StringVar(&host, "H", "localhost", "the host of the server.")
+	flag.Parse()
 
 	// connect to this socket
 	reader := bufio.NewReader(os.Stdin)
@@ -23,7 +32,8 @@ func main() {
 	signal.Notify(gracefulStop, syscall.SIGTERM)
 	signal.Notify(gracefulStop, syscall.SIGINT)
 
-	conn, _ := net.Dial("tcp", "127.0.0.1:8081")
+	serverAddress := host + ":" + port
+	conn, _ := net.Dial("tcp", serverAddress)
 	for {
 		go func() {
 			sig := <-gracefulStop
