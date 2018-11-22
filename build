@@ -81,7 +81,9 @@ if [ "$BUILD_FOR_ALL" == "false" ]; then
   mv client $GOBIN/$OSTYPE
   mv server $GOBIN/$OSTYPE
   echo "Compressing Files..."
-  zip -r $GOBIN/$OSTYPE.zip $GOBIN/$OSTYPE
+  cd $build_directory
+  zip -r -q $OSTYPE.zip $OSTYPE
+  cd ..
   echo "Build Finished."
 fi
 
@@ -93,7 +95,7 @@ if [ "$BUILD_FOR_ALL" == "true" ]; then
 
   echo "Build for Windows..."
   GOOS="windows"
-  echo "\t ix86.."
+  echo -e "\t ix86.."
   GOARCH="386"
   echo -e "\t \t Building Server..."
   env GOOS=$GOOS GOARCH=$GOARCH go build server.go
@@ -103,7 +105,7 @@ if [ "$BUILD_FOR_ALL" == "true" ]; then
   mkdir -p $TARGET_FOLDER
   mv client.exe $TARGET_FOLDER
   mv server.exe $TARGET_FOLDER
-  echo "\t x86_64.."
+  echo -e "\t x86_64.."
   GOARCH="amd64"
   echo -e "\t \t Building Server..."
   env GOOS=$GOOS GOARCH=$GOARCH go build server.go
@@ -113,12 +115,14 @@ if [ "$BUILD_FOR_ALL" == "true" ]; then
   mkdir -p $TARGET_FOLDER
   mv client.exe $TARGET_FOLDER
   mv server.exe $TARGET_FOLDER
-  echo "\t Compressing Files..."
-  zip -r $GOBIN/$GOOS.zip $GOBIN/$GOOS
+  echo -e "\t Compressing Files..."
+  cd $build_directory
+  zip -r -q $GOOS.zip $GOOS
+  cd ..
 
   echo "Build for Linux..."
   GOOS="linux"
-  echo "\t ix86.."
+  echo -e "\t ix86.."
   GOARCH="386"
   echo -e "\t \t Building Server..."
   env GOOS=$GOOS GOARCH=$GOARCH go build server.go
@@ -128,7 +132,7 @@ if [ "$BUILD_FOR_ALL" == "true" ]; then
   mkdir -p $TARGET_FOLDER
   mv client $TARGET_FOLDER
   mv server $TARGET_FOLDER
-  echo "\t x86_64.."
+  echo -e "\t x86_64.."
   GOARCH="amd64"
   echo -e "\t \t Building Server..."
   env GOOS=$GOOS GOARCH=$GOARCH go build server.go
@@ -138,12 +142,14 @@ if [ "$BUILD_FOR_ALL" == "true" ]; then
   mkdir -p $TARGET_FOLDER
   mv client $TARGET_FOLDER
   mv server $TARGET_FOLDER
-  echo "\t Compressing Files..."
-  zip -r $GOBIN/$GOOS.zip $GOBIN/$GOOS
+  echo -e "\t Compressing Files..."
+  cd $build_directory
+  zip -r -q $GOOS.zip $GOOS
+  cd ..
 
   echo "Build for MacOS..."
   GOOS="darwin"
-  echo "\t ix86.."
+  echo -e "\t ix86.."
   GOARCH="386"
   echo -e "\t \t Building Server..."
   env GOOS=$GOOS GOARCH=$GOARCH go build server.go
@@ -153,7 +159,7 @@ if [ "$BUILD_FOR_ALL" == "true" ]; then
   mkdir -p $TARGET_FOLDER
   mv client $TARGET_FOLDER
   mv server $TARGET_FOLDER
-  echo "\t x86_64.."
+  echo -e "\t x86_64.."
   GOARCH="amd64"
   echo -e "\t \t Building Server..."
   env GOOS=$GOOS GOARCH=$GOARCH go build server.go
@@ -163,8 +169,10 @@ if [ "$BUILD_FOR_ALL" == "true" ]; then
   mkdir -p $TARGET_FOLDER
   mv client $TARGET_FOLDER
   mv server $TARGET_FOLDER
-  echo "\tCompressing Files..."
-  zip -r $GOBIN/$GOOS.zip $GOBIN/$GOOS
+  echo -e "\tCompressing Files..."
+  cd $build_directory
+  zip -r -q $GOOS.zip $GOOS
+  cd ..
 fi
 
   echo "Build Finished."
