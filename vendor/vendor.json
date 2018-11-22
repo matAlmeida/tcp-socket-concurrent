@@ -1,6 +1,6 @@
 {
-	"comment": "",
-	"ignore": "test",
-	"package": [],
-	"rootPath": "github.com/matalmeida/tcp-socket"
+  "comment": "",
+  "ignore": "test",
+  "package": [],
+  "rootPath": "github.com/matalmeida/tcp-socket"
 }
