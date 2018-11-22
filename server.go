@@ -33,7 +33,7 @@ func main() {
 		}
 
 		go func(c net.Conn) {
-			fmt.Printf("%s has Connected!\n", c.RemoteAddr().String())
+			log.Print(c.RemoteAddr().String(), " - ", "CONNECTED", " - ", "", " - ", "")
 			for {
 				message, _ := bufio.NewReader(c).ReadString('\n')
 				recvmessage := strings.Split(message, "~")
@@ -59,9 +59,9 @@ func main() {
 						c.Write([]byte(msgToSend))
 					}
 
-				} else if command == "exit" || command == "" {
+				} else if command == "exit" {
 					msgToSend = "Bye Bye\n"
-					fmt.Printf("%s has Disconnected!\n", c.RemoteAddr().String())
+					log.Print(c.RemoteAddr().String(), " - ", strings.ToUpper(command), " - ", strings.Replace(strings.Join(recvmessage[1:], ""), "\n", "", -1), " - ", strings.Replace(msgToSend, "\n", "", -1))
 					c.Write([]byte(msgToSend))
 					break
 

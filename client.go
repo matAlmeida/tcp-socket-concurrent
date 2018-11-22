@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 )
 
 func main() {
@@ -16,8 +18,24 @@ func main() {
 	username, _ := reader.ReadString('\n')
 	username = strings.Replace(username, "\n", "", -1)
 
+	// catch ctrl+c
+	var gracefulStop = make(chan os.Signal)
+	signal.Notify(gracefulStop, syscall.SIGTERM)
+	signal.Notify(gracefulStop, syscall.SIGINT)
+
 	conn, _ := net.Dial("tcp", "127.0.0.1:8081")
 	for {
+		go func() {
+			sig := <-gracefulStop
+			if sig != nil {
+				// fmt.Printf("exiting%+v\n", sig)
+				fmt.Fprintf(conn, "exit\n")
+				message, _ := bufio.NewReader(conn).ReadString('\n')
+				fmt.Print("\nHOTLINE: " + message + "\n")
+				os.Exit(0)
+			}
+		}()
+
 		// read in input from stdin
 		fmt.Print(username + ": ")
 		text, _ := reader.ReadString('\n')
