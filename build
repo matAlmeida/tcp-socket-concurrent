@@ -9,11 +9,6 @@ where:\n
 inputs:\n
 \t	<GO_FILE>	path to the the go file to be built"
 
-# if [ $# -eq 0 ]; then
-#   echo -e "No arguments supplied.\n\nRun $0 -h to see a helpful text"
-# 	exit 1
-# fi
-
 if [ "$1" == "-h" ]; then
   echo -e $usage
   exit 0
@@ -41,7 +36,7 @@ if [ "$2" == "--all" ]; then
   BUILD_FOR_ALL="true"
 fi
 
-#Polyfill for MacOsX
+# Polyfill for MacOsX
 realpath() {
   [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
 }
@@ -85,7 +80,47 @@ if [ "$BUILD_FOR_ALL" == "false" ]; then
   zip -r -q $OSTYPE.zip $OSTYPE
   cd ..
   echo "Build Finished."
+  exit 0
 fi
+
+build_server_client() {
+  GOOS=$1
+  GOARCH=$2
+  GOBIN=$3
+
+  extention=""
+  if [[ $GOOS == *"windows"* ]]; then
+    extention=".exe"
+  fi
+
+  echo -e "\t \t Building Server..."
+  env GOOS=$GOOS GOARCH=$GOARCH go build server.go
+  echo -e "\t \t Building Client..."
+  env GOOS=$GOOS GOARCH=$GOARCH go build client.go
+  TARGET_FOLDER=$GOBIN/$GOOS/$GOARCH
+  mkdir -p $TARGET_FOLDER
+  mv client$extention $TARGET_FOLDER
+  mv server$extention $TARGET_FOLDER
+}
+
+# Build for 32 and 64 bits
+build_86_64() {
+  GOOS="$1"
+  GOBIN="$2"
+
+  echo -e "\t ix86.."
+  GOARCH="386"
+  build_server_client $GOOS $GOARCH $GOBIN
+
+  echo -e "\t x86_64.."
+  GOARCH="amd64"
+  build_server_client $GOOS $GOARCH $GOBIN
+
+  echo -e "\t Compressing Files..."
+  cd $build_directory
+  zip -r -q $GOOS.zip $GOOS
+  cd ..
+}
 
 if [ "$BUILD_FOR_ALL" == "true" ]; then
   if [ -d $GOBIN ]; then
@@ -95,84 +130,16 @@ if [ "$BUILD_FOR_ALL" == "true" ]; then
 
   echo "Build for Windows..."
   GOOS="windows"
-  echo -e "\t ix86.."
-  GOARCH="386"
-  echo -e "\t \t Building Server..."
-  env GOOS=$GOOS GOARCH=$GOARCH go build server.go
-  echo -e "\t \t Building Client..."
-  env GOOS=$GOOS GOARCH=$GOARCH go build client.go
-  TARGET_FOLDER=$GOBIN/$GOOS/$GOARCH
-  mkdir -p $TARGET_FOLDER
-  mv client.exe $TARGET_FOLDER
-  mv server.exe $TARGET_FOLDER
-  echo -e "\t x86_64.."
-  GOARCH="amd64"
-  echo -e "\t \t Building Server..."
-  env GOOS=$GOOS GOARCH=$GOARCH go build server.go
-  echo -e "\t \t Building Client..."
-  env GOOS=$GOOS GOARCH=$GOARCH go build client.go
-  TARGET_FOLDER=$GOBIN/$GOOS/$GOARCH
-  mkdir -p $TARGET_FOLDER
-  mv client.exe $TARGET_FOLDER
-  mv server.exe $TARGET_FOLDER
-  echo -e "\t Compressing Files..."
-  cd $build_directory
-  zip -r -q $GOOS.zip $GOOS
-  cd ..
+  build_86_64 $GOOS $GOBIN
 
   echo "Build for Linux..."
   GOOS="linux"
-  echo -e "\t ix86.."
-  GOARCH="386"
-  echo -e "\t \t Building Server..."
-  env GOOS=$GOOS GOARCH=$GOARCH go build server.go
-  echo -e "\t \t Building Client..."
-  env GOOS=$GOOS GOARCH=$GOARCH go build client.go
-  TARGET_FOLDER=$GOBIN/$GOOS/$GOARCH
-  mkdir -p $TARGET_FOLDER
-  mv client $TARGET_FOLDER
-  mv server $TARGET_FOLDER
-  echo -e "\t x86_64.."
-  GOARCH="amd64"
-  echo -e "\t \t Building Server..."
-  env GOOS=$GOOS GOARCH=$GOARCH go build server.go
-  echo -e "\t \t Building Client..."
-  env GOOS=$GOOS GOARCH=$GOARCH go build client.go
-  TARGET_FOLDER=$GOBIN/$GOOS/$GOARCH
-  mkdir -p $TARGET_FOLDER
-  mv client $TARGET_FOLDER
-  mv server $TARGET_FOLDER
-  echo -e "\t Compressing Files..."
-  cd $build_directory
-  zip -r -q $GOOS.zip $GOOS
-  cd ..
+  build_86_64 $GOOS $GOBIN
 
   echo "Build for MacOS..."
   GOOS="darwin"
-  echo -e "\t ix86.."
-  GOARCH="386"
-  echo -e "\t \t Building Server..."
-  env GOOS=$GOOS GOARCH=$GOARCH go build server.go
-  echo -e "\t \t Building Client..."
-  env GOOS=$GOOS GOARCH=$GOARCH go build client.go
-  TARGET_FOLDER=$GOBIN/$GOOS/$GOARCH
-  mkdir -p $TARGET_FOLDER
-  mv client $TARGET_FOLDER
-  mv server $TARGET_FOLDER
-  echo -e "\t x86_64.."
-  GOARCH="amd64"
-  echo -e "\t \t Building Server..."
-  env GOOS=$GOOS GOARCH=$GOARCH go build server.go
-  echo -e "\t \t Building Client..."
-  env GOOS=$GOOS GOARCH=$GOARCH go build client.go
-  TARGET_FOLDER=$GOBIN/$GOOS/$GOARCH
-  mkdir -p $TARGET_FOLDER
-  mv client $TARGET_FOLDER
-  mv server $TARGET_FOLDER
-  echo -e "\tCompressing Files..."
-  cd $build_directory
-  zip -r -q $GOOS.zip $GOOS
-  cd ..
+  build_86_64 $GOOS $GOBIN
 fi
 
-  echo "Build Finished."
+echo "Build Finished."
+exit 0
